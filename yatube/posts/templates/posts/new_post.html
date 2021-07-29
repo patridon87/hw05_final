@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_edit %}Редактировать запись{% else %}Добавить запись{% endif %}
+{% endblock %}
+{% block content %}
+
+  <div class="row justify-content-center">
+    <div class="col-md-8 p-5">
+      <div class="card">
+      {% if is_edit %}
+        <div class="card-header">Редактировать запись</div>
+      {% else %}
+        <div class="card-header">Добавить запись</div>
+      {% endif %}
+        <div class="card-body">
+          {% if next %}
+            <div class="alert alert-info" role="alert">
+              Вы обратились к странице, доступ к которой возможен
+              только для залогиненных пользователей.<br>
+              Пожалуйста, авторизуйтесь.
+            </div>
+          {% endif %}
+
+          <form method="post" enctype="multipart/form-data" action="{% if is_edit %}{% url 'post_edit' username=post.author post_id=post.id%}{% else %}{% url 'new_post' %}{%endif%} ">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            <div class="form-group row">
+            {{ form.as_p }}
+
+          <div class="col-md-6 offset-md-4">
+            <button type="submit" class="btn btn-primary">
+              {% if is_edit %}Сохранить{% else %}Добавить{% endif %}
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
