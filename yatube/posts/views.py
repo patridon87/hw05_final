@@ -46,7 +46,7 @@ def profile(request, username):
     if request.user.username == username:
         button = False
     if request.user.is_authenticated:
-        following = True
+        following = Follow.objects.filter(user=request.user, author=author)
     context = {
         "author": author,
         "count": count,
