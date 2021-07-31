@@ -1,24 +1,23 @@
 import shutil
-import tempfile
 
 from django.core.cache import cache
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django import forms
 
 from ..models import Post, Group
 
 User = get_user_model()
+TEST_DIR = "test_data"
 
 
+@override_settings(MEDIA_ROOT=TEST_DIR + "/media")
 class YatubePagesTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
         cls.small_gif = (
             b"\x47\x49\x46\x38\x39\x61\x02\x00"
             b"\x01\x00\x80\x00\x00\x00\x00\x00"
@@ -61,8 +60,12 @@ class YatubePagesTest(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
-        super().tearDownClass()
+        print("\nDeleting temporary files...\n")
+
+    try:
+        shutil.rmtree(TEST_DIR)
+    except OSError:
+        pass
 
     def setUp(self):
         self.mihailov_client = Client()
@@ -255,10 +258,6 @@ class CacheTest(TestCase):
 
         cls.mihailov = User.objects.create_user(id=2,
                                                 username="StasMihailov")
-        # cls.post = Post.objects.create(
-        #     text="Пост для теста кэша",
-        #     author=CacheTest.mihailov
-        # )
 
     def setUp(self):
         self.mihailov_client = Client()
@@ -274,7 +273,6 @@ class CacheTest(TestCase):
             id=1
         )
         post_count = len(response.context["page"].object_list)
-        print(f"Количество постов {post_count}")
         self.assertEqual(len(response.context["page"].object_list), post_count)
 
         cache.clear()
@@ -283,6 +281,5 @@ class CacheTest(TestCase):
         post_count_after_clear = len(
             second_response.context["page"].object_list
         )
-        print(f"Количество постов {post_count_after_clear}")
         self.assertEqual(len(second_response.context["page"].object_list),
                          post_count_after_clear)

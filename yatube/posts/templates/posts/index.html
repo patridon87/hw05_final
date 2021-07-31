@@ -3,6 +3,10 @@
 {% block header %}Последние обновления на сайте{% endblock %}
 {% block content %}
 {% load thumbnail %}
+<div class="container">
+
+    {% include "posts/menu.html" with index=True %}
+
 
   {% for post in page %}
     {% include "posts/post_item.html" with post=post %}
@@ -10,5 +14,5 @@
 
 
   {% include "paginator.html" %}
-
+</div>
 {% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Последние обновления ленты избранных авторов{% endblock %}
+{% block header %}Последние обновления ленты избранных авторов{% endblock %}
+{% block content %}
+{% load thumbnail %}
+<div class="container">
+
+    {% include "posts/menu.html" with follow=True %}
+
+
+  {% for post in page %}
+    {% include "posts/post_item.html" with post=post %}
+  {% endfor %}
+
+
+  {% include "paginator.html" %}
+
+{% endblock %}
