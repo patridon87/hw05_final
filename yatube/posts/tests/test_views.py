@@ -270,7 +270,6 @@ class CacheTest(TestCase):
         Post.objects.create(
             text="Второй пост для теста кэша",
             author=CacheTest.mihailov,
-            id=1
         )
         post_count = len(response.context["page"].object_list)
         self.assertEqual(len(response.context["page"].object_list), post_count)
