@@ -10,10 +10,12 @@ from .forms import PostForm, CommentForm
 
 User = get_user_model()
 
+
 def is_following(user, author):
     if Follow.objects.filter(user=user, author=author):
         return True
     return False
+
 
 @require_GET
 def index(request):
@@ -51,7 +53,6 @@ def profile(request, username):
     followers_count = author.following.count()
     following_count = author.follower.count()
     follow_button_display = request.user.username != username
-
 
     if request.user.is_authenticated:
         following = is_following(user=request.user, author=author)
@@ -126,9 +127,6 @@ def post_edit(request, username, post_id):
 
     context = {"form": form, "post": post, "is_edit": True}
     return render(request, "posts/new_post.html", context)
-
-
-
 
 
 @require_http_methods(["GET", "POST"])
