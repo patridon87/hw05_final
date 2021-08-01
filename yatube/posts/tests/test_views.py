@@ -1,5 +1,7 @@
 import shutil
+import tempfile
 
+from django.conf import settings
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -10,7 +12,7 @@ from django import forms
 from ..models import Post, Group
 
 User = get_user_model()
-TEST_DIR = "test_data"
+TEST_DIR = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
 @override_settings(MEDIA_ROOT=TEST_DIR + "/media")
@@ -62,10 +64,10 @@ class YatubePagesTest(TestCase):
     def tearDownClass(cls):
         print("\nDeleting temporary files...\n")
 
-    try:
-        shutil.rmtree(TEST_DIR)
-    except OSError:
-        pass
+        try:
+            shutil.rmtree(TEST_DIR)
+        except OSError:
+            pass
 
     def setUp(self):
         self.mihailov_client = Client()

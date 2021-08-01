@@ -4,7 +4,7 @@ import tempfile
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from ..forms import PostForm
@@ -13,11 +13,11 @@ from ..models import Group, Post
 User = get_user_model()
 
 
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp(dir=settings.BASE_DIR))
 class PostCreateFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
         cls.test_group = Group.objects.create(
             title="Тестовая группа 1",
             slug="test_group_1",
@@ -99,11 +99,8 @@ class PostCreateFormTests(TestCase):
             response, reverse("post",
                               kwargs={"username": "tolstoy", "post_id": 80})
         )
-        self.assertTrue(
-            Post.objects.filter(
-                text="Измененный текст",
-            ).exists()
-        )
+        self.test_post.refresh_from_db()
+        self.assertEqual(self.test_post.text, "Измененный текст")
 
     def test_edit_post_with_edit_group(self):
         form_data = {

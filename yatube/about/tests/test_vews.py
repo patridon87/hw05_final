@@ -11,9 +11,11 @@ class StaticViewsTests(TestCase):
     def test_about_and_tech_pages_accessible_by_name(self):
         """Страницы about и tech доступны по сгенерированному по name URL"""
         reverse_names = [reverse("about:author"), reverse("about:tech")]
+
         for name in reverse_names:
-            response = self.guest_client.get(name)
-            self.assertEqual(response.status_code, HTTPStatus.OK)
+            with self.subTest(name=name):
+                response = self.guest_client.get(name)
+                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_about_page_uses_correct_template(self):
         """При запросе к страницам about и tech применяются
