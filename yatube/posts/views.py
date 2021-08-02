@@ -12,9 +12,7 @@ User = get_user_model()
 
 
 def is_following(user, author):
-    if Follow.objects.filter(user=user, author=author):
-        return True
-    return False
+    return Follow.objects.filter(user=user, author=author).exists()
 
 
 @require_GET
@@ -151,10 +149,7 @@ def add_comment(request, username, post_id):
 def follow_index(request):
     user = get_object_or_404(User, username=request.user.username)
 
-    follows = list(user.follower.all())
-    authors = [follow.author for follow in follows]
-
-    posts = Post.objects.filter(author__in=authors)
+    posts = Post.objects.filter(author__following__user=user)
     paginator = Paginator(posts, 10)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
