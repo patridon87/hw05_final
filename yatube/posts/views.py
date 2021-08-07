@@ -17,13 +17,15 @@ def is_following(user, author):
 
 @require_GET
 def index(request):
-    posts = cache.get("index-page")
-    if posts is None:
-        posts = Post.objects.all()
-        cache.set("index-page", posts, timeout=20)
-    paginator = Paginator(posts, 10)
     page_number = request.GET.get("page")
+    cached_page = cache.get(f"index-page-{page_number}")
+    if cached_page:
+        return render(request, "posts/index.html", {"page": cached_page})
+
+    posts = Post.objects.all()
+    paginator = Paginator(posts, 10)
     page = paginator.get_page(page_number)
+    cache.set(f"index-page-{page_number}", page, timeout=20)
     return render(request, "posts/index.html", {"page": page})
 
 
